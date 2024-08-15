@@ -1,0 +1,20 @@
+1723514296497	Delete element
+1723722916040	Rename type 'addPageController'
+1723722944834	Rename type 'DeleteEmployee'
+1723723114908	Rename type 'loginController'
+1723723273704	Rename type 'findByIdController'
+1723723320747	Rename type 'homePageController'
+1723723367025	Rename type 'updatePageController'
+1723723630812	Delete element
+1723723658445	Rename type 'logoutController'
+1723723678707	Delete element
+1723723690321	Delete element
+1723726001523	Delete element
+1723726008871	Delete element
+1723726379255	Rename resource 'addServlet.java'
+1723726428221	Rename resource 'deleteServlet.java'
+1723726465451	Rename resource 'updateServlet.java'
+1723726580950	Rename resource 'loginServlet.java'
+1723726599905	Rename resource 'homeServlet.java'
+1723726615846	Rename resource 'logoutServlet.java'
+1723726639301	Rename resource 'viewDetailServlet.java'

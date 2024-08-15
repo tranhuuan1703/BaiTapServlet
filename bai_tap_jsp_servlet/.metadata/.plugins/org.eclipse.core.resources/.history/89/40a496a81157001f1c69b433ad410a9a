@@ -1,0 +1,107 @@
+package controller;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import dao.*;
+import entity.Admin;
+import entity.Employee;
+import entity.Position;
+/**
+ * Servlet implementation class addEmployeeController
+ */
+@WebServlet("/addEmployeeController")
+public class addEmployeeController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public addEmployeeController() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    private java.sql.Date convertStringToDate(String employeeBirthDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date parsedDate = dateFormat.parse(employeeBirthDate);
+            return new java.sql.Date(parsedDate.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+  
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		
+		// lay thong tin tu form
+		String employeeName = request.getParameter("nameEmployee"); // lay thong tin ten
+		String employeeBirthDate = request.getParameter("birthDayEmployee"); // lay thong tin ngay sinh
+		String employeeEmail = request.getParameter("emailEmployee"); // lay thong tin email
+		String employeeAge = request.getParameter("ageEmployee"); // lay thong tin tuoi
+		String employeeGender = request.getParameter("inlineRadioOptions"); // ly thong tin option cua gioi tinh
+		String employeePosition = request.getParameter("position"); // lay thong tin cua vi tri
+		String employeeAddress = request.getParameter("addressEmployee"); // lay thong tin dia chi
+		String employeeDateOfJoiningTheCompany = request.getParameter("dateJoiningBirthday"); // lay thong tin ngay vao nhan vien
+		
+		
+		// convert string to date
+		java.sql.Date SqemployeeBirthDate = convertStringToDate(employeeBirthDate);
+		java.sql.Date sqemployeeDateOfJoiningTheCompany = convertStringToDate(employeeDateOfJoiningTheCompany);
+		
+		int sqemployeeAge = 0;
+		sqemployeeAge = Integer.parseInt(employeeAge);
+		
+		
+		// tao cac object
+		EmployeeDao insertEmployee = new EmployeeDao();
+		Admin admin = new Admin();
+		Position position = new Position();
+		position.setPosition(employeePosition);
+				
+				
+		// tao mot object employee
+		Employee employee = new Employee(employeeName, employeeEmail, 
+										SqemployeeBirthDate, sqemployeeAge,
+										employeeGender, employeeAddress, 
+										position, sqemployeeDateOfJoiningTheCompany, admin);
+		// insert		
+		insertEmployee.insert(employee.getEmployeeName(), 
+							employee.getEmployeeEmail(),
+							employee.getEmployeeBirthDate(),
+							employee.getEmployeeAge(),
+							employee.getEmployeeGender(),
+							employee.getEmployeeAddress(),
+							employee.getPosition(),
+							employee.getDateOfJoiningTheCompany(),
+							employee.getAdmin());
+
+		
+		response.sendRedirect("home?page=1");
+		System.out.println("Successfully!");
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

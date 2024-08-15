@@ -1,0 +1,74 @@
+package controller;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import dao.EmployeeDao;
+import entity.*;
+
+/**
+ * Servlet implementation class home
+ */
+@WebServlet("/home")
+public class homePageController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public homePageController() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		
+		HttpSession session = request.getSession();
+			
+		// lay ten de hien thi ra man hinh
+		Admin admin = (Admin)session.getAttribute("accountAdmin");
+		request.setAttribute("nameAdmin", admin.getFullName()); // dung de hien thi fullName ra man hinh
+		
+		// khoi tao cac doi tuong
+		EmployeeDao employee = new EmployeeDao(); // employee dao
+		
+		// lay gia tri so luog record trong data employee
+		int count = employee.CountData() / 10;
+		request.setAttribute("countEmployee", count); 
+		
+		String text = request.getParameter("search");
+		try {
+			// lay so trang
+			String num = request.getParameter("page");
+			int pageNumber = Integer.parseInt(num);
+			
+			
+			
+			List<Employee> employees = employee.paginationPage(pageNumber, text);
+			
+			employees.forEach(System.out::println);
+			request.setAttribute("employeeList", employees);
+			
+		}catch(Exception e) {
+			List<Employee> employees = employee.paginationPage(0, text);
+			request.setAttribute("employeeList", employees);
+			
+		}
+		
+		RequestDispatcher requestDispatcher;
+        requestDispatcher=request.getRequestDispatcher("/views/Home.jsp");
+        requestDispatcher.forward(request, response);
+
+	}
+
+}

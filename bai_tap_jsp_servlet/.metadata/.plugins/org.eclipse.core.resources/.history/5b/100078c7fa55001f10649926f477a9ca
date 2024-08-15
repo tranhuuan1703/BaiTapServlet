@@ -1,0 +1,239 @@
+package dao;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import entity.*;
+import utils.connect.connect;
+
+public class EmployeeDao {
+	
+	Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    
+    // them mot nhan vien
+    public void insert(String employeeName, String employeeEmail, Date employeeBirthDate, int employeeAge, String employeeGender,
+    						String employeeAddress, Position position, Date DateJoiningTheCompany, Admin admin) {
+    	
+    	String query = "Insert Into tableemployee(employeeName, employeeEmail, employeeBirthDate, employeeAge, employeeGender, employeeAddress, positionId, DateOfJoiningTheCompany, adminId)"
+    			+ "value(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    	
+    	try {
+    		conn = new connect().connection();
+    		ps = conn.prepareStatement(query);
+    		
+    		ps.setString(1, employeeName);
+    		ps.setString(2, employeeEmail);
+    		ps.setDate(3, (java.sql.Date) employeeBirthDate);
+    		ps.setInt(4, employeeAge);
+    		ps.setString(5, employeeGender);
+    		ps.setString(6, employeeAddress);
+    		ps.setInt(7, position.getPositionId());
+    		ps.setDate(8, (java.sql.Date) DateJoiningTheCompany);
+    		ps.setInt(9,  admin.getAdminId());
+    		
+    		ps.executeUpdate();
+    		conn.close();
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+    
+    // updated mot nhan vien
+    public void update(int employeeId, String employeeName, String employeeEmail, String employeeBirthDate, int employeeAge, String employeeGender,
+    						String employeeAddress, Position position, String DateJoiningTheCompany) {
+    	String sql = "UPDATE tableemployee\r\n"
+    			+ "SET employeeName  = ?, employeeEmail  = ?, employeeBirthDate  = ?, employeeAge  = ?, employeeAddress = ?, employeeGender  = ?, positionId  = ?, DateOfJoiningTheCompany = ?\r\n"
+    			+ "WHERE employeeId = ?;";
+    	
+    	try {
+    		conn = new connect().connection();
+    		ps = conn.prepareStatement(sql);
+    		
+    		ps.setString(1, employeeName);
+    		ps.setString(2, employeeEmail);
+    		ps.setString(3, employeeBirthDate);
+    		ps.setInt(4, employeeAge);
+    		ps.setString(5,  employeeAddress);
+    		ps.setString(6, employeeGender);
+    		ps.setInt(7, position.getPositionId());
+    		ps.setString(8, DateJoiningTheCompany);
+    		ps.setInt(9,  employeeId);
+    		
+    		ps.executeUpdate();
+    		conn.close();
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+    
+    // tim kiem nhan vien theo id
+    public ResultSet queryEmployee(int employeeId) {
+    	String sql = "select * from tableemployee where employeeId = ?";
+    	
+    	try {
+    		conn = new connect().connection();
+    		ps = conn.prepareStatement(sql);
+    		
+    		ps.setInt(1, employeeId);
+    		
+    		
+    		rs = ps.executeQuery();
+    		conn.close();
+    		return rs;
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	return null;
+    }
+    
+    // truy van tat ca nhan vien
+    public List<Employee> queryAllEmployee() {
+    	String sql = "select * from tableemployee";
+    	Position position = new Position();
+    	Admin admin = new Admin();
+    	List<Employee> list = new ArrayList<>();
+    	
+    	try {
+    		conn = new connect().connection();
+    		ps = conn.prepareStatement(sql);
+    		rs = ps.executeQuery();
+    		
+    		
+
+    		while (rs.next()) {
+    			
+    			position.setPositionId(rs.getInt("positionId"));
+    			
+    			Employee employee = new Employee(rs.getInt("employeeId"), rs.getString("employeeName"), rs.getString("employeeEmail"), 
+						rs.getDate("employeeBirthDate"), rs.getInt("employeeAge"), rs.getString("employeeGender"),
+						rs.getString("employeeAddress"), position, rs.getDate("DateOfJoiningTheCompany"));
+    			
+    			
+    			list.add(employee);
+    			
+    		}
+    		conn.close();
+    		return list;
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	return null;
+    }
+    
+    // delete row
+    public void deleteEmployee(int employeeId) {
+    	
+    	String sql = "DELETE FROM tableemployee WHERE employeeId = ?;";
+    	
+    	try {
+    		conn = new connect().connection();
+    		ps = conn.prepareStatement(sql);
+    		ps.setInt(1, employeeId);
+    		
+    		ps.executeUpdate();
+    		conn.close();
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+    
+    // pagination page
+    
+    public int CountData() {
+    	String sql = "select count(employeeId) from tableemployee";
+    	
+    	try {
+    		int count = 0;
+    		conn = new connect().connection();
+    		
+    		ps = conn.prepareStatement(sql);
+    		rs = ps.executeQuery();
+    		while (rs.next()) {
+    			count = rs.getInt(1);
+    		}
+    		conn.close();
+    		return count;
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    		}
+    	
+    	return 0;
+    }
+    public List<Employee> paginationPage(int page, String text) {
+    	
+    	
+    	String sql = null;
+    	// tao mot list de them cac employee vao
+    	List<Employee> list = new ArrayList<>();
+    	
+    	
+    	try {
+    		conn = new connect().connection();
+    		if (text != null) {
+    			Position position = new Position();
+    			// xu ly text
+    	    	String[] texts = text.split("[,]");
+    	    	String employeeName = texts[0];
+    	    	String employeeGender = texts[2];
+    	    	String employeePosition = texts[1];
+    	    	
+    	    	
+    	    	// set object position
+    	    	position.setPosition(employeePosition);
+    	    	sql = "select * from tableemployee where employeeName LIKE ? or positionId like ? or employeeGender like ?;";
+    	    	
+    	    	ps = conn.prepareStatement(sql);
+    	    	
+    	    	ps.setString(1, "%" + employeeName + "%");
+        		ps.setString(2, "%" + position.getPositionId() + "%");
+        		ps.setString(3, "%" + employeeGender + "%");
+        		
+        		rs = ps.executeQuery();
+    	    	
+        		
+        		
+    		}else {
+    			sql = "select * from tableemployee LIMIT 5 OFFSET ?;";
+    			ps = conn.prepareStatement(sql);
+        		int number = (5 * page);
+        		
+        		ps.setInt(1, number);
+        		rs = ps.executeQuery();
+    		}
+    		
+    		
+			while (rs.next()) {
+			    
+				
+    			Position nposition = new Position();
+    			nposition.setPositionId(rs.getInt("positionId"));
+    			
+    			// System.out.println(position.getPositionId() + " " + position.getPosition());
+    			Employee employee = new Employee(rs.getInt("employeeId"), rs.getString("employeeName"), rs.getString("employeeEmail"), 
+						rs.getDate("employeeBirthDate"), rs.getInt("employeeAge"), rs.getString("employeeGender"),
+						rs.getString("employeeAddress"), nposition, rs.getDate("DateOfJoiningTheCompany"));
+    			
+    			
+    			list.add(employee);
+    			
+    		}
+			conn.close();
+    		return list;
+    		
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    		}
+    	
+    	return null;
+    }
+    
+    
+}

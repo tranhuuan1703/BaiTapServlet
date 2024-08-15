@@ -1,0 +1,35 @@
+package utils;
+
+import java.util.regex.Pattern;
+
+
+public class validatedData {
+	
+	
+	// format regex
+	private static final String userNameRegex = "^[a-zA-Z ]{3, 20}$";
+	private static final String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}$";
+	private static final String genderRegex = "^(male|female|other)$";
+	private static final String positionRegex = "^(boss|employee)$";
+	
+	// kiem tra format userName xem dung hay sai
+	public static boolean isUserNameRegex(String userName) {
+		return Pattern.matches(userNameRegex, userName);
+	}
+	
+	// Kiem tra format emaile xem dung hay sai
+	public static boolean isEmailRegex(String email) {
+		return Pattern.matches(emailRegex, email);
+	}
+	
+	// kiem tra format gender xem dung hay sai
+	public static boolean isGenderRegex(String gender) {
+		return Pattern.matches(genderRegex, gender);
+	}
+	
+	
+	// kiem tra format position xem dung hay sai
+	public static boolean isPositionRegex(String position) {
+		return Pattern.matches(positionRegex, position);
+	}
+}

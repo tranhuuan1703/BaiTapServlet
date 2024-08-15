@@ -1,0 +1,159 @@
+package controller;
+import entity.Admin;
+import dao.loginDao;
+import utils.connect.*;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.mysql.cj.protocol.Resultset;
+
+/**
+ * Servlet implementation class login
+ */
+@WebServlet("/login")
+public class loginController extends HttpServlet {
+	
+	
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public loginController() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		
+		
+		// khoi tao session va cookie
+		HttpSession session =  request.getSession();
+		Cookie[] cookies = request.getCookies();
+		
+		
+		// khai bao cac gia tri thong tin khi nguoi dung nhap sai
+		String userNameError = "Ban nhap sai thong tin UserName";	// thong bao use nhap sai
+		String passWordError = "Ban nhap sai thong tin PassWord";	// thong bao password nhap sai
+		
+		
+		
+		
+		
+		String useName = request.getParameter("email");				// lay gia tri the input email
+		String passWord = request.getParameter("password");			// lay gia tri the input password
+		
+		
+		String remeberMe = request.getParameter("rememberMe");  	// lay gia tri co set email va password vao cookie khoong
+		
+		// khoi tao cac boject
+		loginDao lg = new loginDao();										// khoi tao su object Dao de xu ly login
+		Admin admin = new Admin(useName, passWord);	
+		//ResultSet check = lg.login(admin.getEmail(), admin.getPassWord()); // kiem tra gia tai khoan email va password co nam trong database login
+		
+		
+		
+		try {
+			if(check.next()) {
+				
+				// lay thong tin da truy van fullnam, emaill, password
+				String emailAccount = check.getString("emailadress");
+				String passWordAccount = check.getString("userPassword");
+				String nameAccount = check.getString("fullName");
+				
+				
+				// so sanh email va pass word co dung hoan toan hay khong
+				if (admin.getEmail().equals(emailAccount) && admin.getPassWord().equals(passWordAccount)) {
+				
+					admin.setFullName(nameAccount);
+					// tao session
+					session.setAttribute("accountAdmin", admin);
+					
+					if (remeberMe != null) {
+						System.out.println(remeberMe);
+						Cookie Ucookie = new Cookie("useName", useName);
+						Cookie Pcookie = new Cookie("PassWord", passWord);
+						
+						// set time 
+						Ucookie.setMaxAge(60*60*24);
+						Pcookie.setMaxAge(60*60*24);
+						
+						// add cookie
+						response.addCookie(Ucookie);
+						response.addCookie(Pcookie);
+				}
+	
+					// redirect den trang hom
+					response.sendRedirect("home?page=1");
+			
+					
+				}else {
+										
+					
+					if (!admin.getEmail().equals(emailAccount)) {
+						userNameError = "Ban nhap sai thong tin UserName";
+						useName = null;
+						passWordError = null;
+					}
+					
+					if(!admin.getPassWord().equals(passWordAccount)) {
+						passWordError = "Ban nhap sai thong tin PassWord";
+						passWord = null;
+						userNameError = null;
+					}
+					
+					// set attribute
+					request.setAttribute("message_userName", userNameError);
+					request.setAttribute("message_passWord", passWordError);
+					request.setAttribute("userName", useName);
+					request.setAttribute("passWord", passWord);
+
+					// forward den trang login
+					request.getRequestDispatcher("/views/login.jsp").forward(request, response);	
+
+				}
+				
+				
+			}else {
+				// set attribute
+				request.setAttribute("message_userName", userNameError);
+				request.setAttribute("message_passWord", passWordError);
+				request.setAttribute("userName", useName);
+				request.setAttribute("passWord", passWord);
+
+				// forward den trang login
+				request.getRequestDispatcher("/views/login.jsp").forward(request, response);	
+			}	
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+		
+		
+	}
+		
+				
+
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+	}
+
+}

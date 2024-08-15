@@ -1,0 +1,103 @@
+package utils;
+
+import java.io.IOException;
+
+import javax.mail.Flags.Flag;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet Filter implementation class validateData
+ */
+@WebFilter(filterName="sessionFilter", urlPatterns={"/addEmployeeController", "/updateEmployeeController"})
+public class validateData extends HttpFilter implements Filter {
+       
+    /**
+     * @see HttpFilter#HttpFilter()
+     */
+    public validateData() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see Filter#destroy()
+	 */
+	public void destroy() {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
+	 */
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		// place your code here
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpServletResponse res = (HttpServletResponse) response;
+		
+		boolean flag = false;
+		String employeeName = req.getParameter("nameEmployee"); // lay thong tin ten
+		String employeeBirthDate = req.getParameter("birthDayEmployee"); // lay thong tin ngay sinh
+		String employeeEmail = req.getParameter("emailEmployee"); // lay thong tin email
+		String employeePosition = req.getParameter("position"); // lay thong tin cua vi tri
+		
+		
+		String msgErrorEmployeeName =  "";
+		String msgErrorEmployeeBirthDate = "";
+		String msgErroremployeeEmail = "";
+		String msgErroremployeePosition = "";
+		
+		
+		req.setAttribute("msgErrorEmployeeName", msgErrorEmployeeName);
+		req.setAttribute("msgErrorEmployeeName", msgErrorEmployeeName);
+		req.setAttribute("msgErrorEmployeeName", msgErrorEmployeeName);
+		// Kiểm tra từng tham số
+        if (employeeName == null || employeeName.isEmpty() || employeeName.matches(".*\\d.*")) {
+        	flag = true;
+        	msgErrorEmployeeName = "Ban bi thieu thong tin hoac sai ten";
+        	req.setAttribute("msgErrorEmployeeName", msgErrorEmployeeName);
+        }
+        if (employeeBirthDate == null || employeeBirthDate.isEmpty()) {
+        	flag = true;
+        	msgErrorEmployeeBirthDate = "Ban thieu thong tin ngay thang nam sinh";
+        	req.setAttribute("msgErrorEmployeeBirthDate", msgErrorEmployeeBirthDate);
+        }
+        if (employeePosition == null || employeePosition.isEmpty()) {
+        	flag = true;
+        	msgErroremployeePosition = "Ban thieu thong tin ngay thang nam sinh";
+        	req.setAttribute("msgErroremployeePosition", msgErroremployeePosition);
+        }
+        if (employeeEmail == null || employeeEmail.isEmpty()) {
+        	flag = true;
+        	msgErroremployeeEmail = "Ban thieu thong tin email";
+        	req.setAttribute("msgErroremployeeEmail", msgErroremployeeEmail);
+        }
+		
+		if(flag == true) {
+			
+			
+		}else {
+			// pass the request along the filter chain
+			chain.doFilter(request, response);
+		}
+		
+	}
+
+	/**
+	 * @see Filter#init(FilterConfig)
+	 */
+	public void init(FilterConfig fConfig) throws ServletException {
+		// TODO Auto-generated method stub
+	}
+
+}

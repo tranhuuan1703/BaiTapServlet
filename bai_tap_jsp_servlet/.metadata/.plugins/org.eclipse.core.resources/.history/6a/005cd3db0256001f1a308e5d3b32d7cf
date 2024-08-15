@@ -1,0 +1,120 @@
+package controller;
+
+
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.util.Date;
+import java.util.HashMap;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import dao.*;
+import entity.Position;
+/**
+ * Servlet implementation class EditController
+ */
+@WebServlet("/EditEmployee")
+public class updatePageController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public updatePageController() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub;
+		
+		HttpSession session = request.getSession();
+		
+//		if (session.getAttribute("accountAdmin") == null) {
+//			response.sendRedirect("login");
+//		}else {
+		// lay parameter trang edit
+		String id = request.getParameter("id");
+		
+		// chuyen id kieu string sang int
+		int employeeId = 0;
+		employeeId = Integer.parseInt(id);
+		
+		// khoi tao lop dao
+		Position position = new Position();
+		EmployeeDao employee = new EmployeeDao();
+		
+		HashMap<String, String> hasMap = employee.queryEmployee(employeeId);
+	
+//		try {
+//			if (check.next()) {
+//				
+//				// lay gia tri trong bang
+//				int Id = check.getInt("employeeId");
+//				String nameEmployee = check.getString("employeeName");
+//				String emailEmployee = check.getString("employeeEmail");
+//				Date employeBirthDay = check.getDate("employeeBirthDate");
+//				int employeeAge = check.getInt("employeeAge");
+//				String employeeGender = check.getString("employeeGender");
+//				String employeeAddress = check.getString("employeeAddress");
+//				int employeePositionId = check.getInt("positionId");
+//				Date employeeDateOfJoiningTheCompany = check.getDate("DateOfJoiningTheCompany");
+//				
+//				// lay gia tri cua position
+//				position.setPositionId(employeePositionId);
+//				String role = position.getPosition();
+//				
+//				
+//				// set Attribute
+//				HashMap<String, String> hashMap = new HashMap<>();
+//				hashMap.put("employeeId", Integer.toString(Id));
+//				hashMap.put("employeeName", nameEmployee);
+//				hashMap.put("emailEmployee", emailEmployee);
+//				hashMap.put("employeBirthDay", employeBirthDay.toString());
+//				hashMap.put("employeeAge", Integer.toString(employeeAge));
+//				hashMap.put("employeeGender", employeeGender);
+//				hashMap.put("employeeAddress", employeeAddress);
+//				hashMap.put("position", role);
+//				hashMap.put("employeeDateOfJoiningTheCompany", employeeDateOfJoiningTheCompany.toString());
+//				
+//				request.setAttribute("employeeInfo", hashMap);
+//				
+//				// forward den trang edit
+//				RequestDispatcher requestDispatcher;
+//				
+//		        requestDispatcher=request.getRequestDispatcher("/views/Edit.jsp");
+//		        requestDispatcher.forward(request, response);
+//		  
+//				
+//			}
+//		}catch(Exception e) {
+//			e.printStackTrace();
+//		}
+		
+		request.setAttribute("employeeInfo", hashMap);
+		// forward den trang edit
+		RequestDispatcher requestDispatcher;
+		
+       requestDispatcher=request.getRequestDispatcher("/views/Edit.jsp");
+       requestDispatcher.forward(request, response);
+	
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

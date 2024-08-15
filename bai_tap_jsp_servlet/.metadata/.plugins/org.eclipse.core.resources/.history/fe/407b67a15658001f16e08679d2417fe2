@@ -1,0 +1,106 @@
+package controller;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import dao.loginDao;
+import entity.Admin;
+
+/**
+ * Servlet implementation class loginPageController
+ */
+@WebServlet("/loginPageController")
+public class loginPageController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public loginPageController() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		Cookie[] cookies = request.getCookies();
+		HttpSession session =  request.getSession();
+		
+		// lay parameters. Neu khong co cookie thi lay input gia tri trong input
+		String useName = null;
+		String passWord = null;
+		
+		if (cookies != null) {
+			
+			// loop de chon gia tri trong name cookie va gia tri trong password cookie
+			for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("useName")) {
+                    useName = cookie.getValue();
+                }
+                if (cookie.getName().equals("PassWord")) {
+                    passWord = cookie.getValue();
+                }
+			}
+		}
+		
+	
+		if (useName != null && passWord != null) {
+			loginDao lg = new loginDao();										// khoi tao su object Dao de xu ly login
+			Admin admin = new Admin(useName, passWord);	
+			ResultSet check = lg.login(admin.getEmail(), admin.getPassWord()); // kiem tra gia tai khoan email va password co nam trong database login
+			
+			try {
+				if(check.next()) {
+					
+					// lay thong tin da truy van fullnam, emaill, password
+					String emailAccount = check.getString("emailadress");
+					String passWordAccount = check.getString("userPassword");
+					String nameAccount = check.getString("fullName");
+					
+					
+					// so sanh email va pass word co dung hoan toan hay khong
+					if (admin.getEmail().equals(emailAccount) && admin.getPassWord().equals(passWordAccount)) {
+					
+						admin.setFullName(nameAccount);
+						// tao session
+						//session.setAttribute("accountAdmin", admin);
+						// redirect den trang hom
+						response.sendRedirect("home?page=1");
+			
+					}
+				}
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}else {
+			request.setAttribute("userName", useName);
+			request.setAttribute("passWord", passWord);
+			
+			// forward den trang login
+			request.getRequestDispatcher("/views/login.jsp").forward(request, response);	
+		}
+		}
+		
+		
+//	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
